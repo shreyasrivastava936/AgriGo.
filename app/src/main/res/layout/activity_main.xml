@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    >
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:autofillHints="please take a photo"
+        android:src="#629d62"
+       />
+    <Button
+        android:id="@+id/imageView2"
+        android:layout_below="@id/imageView"
+        android:layout_marginTop="-50dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_centerHorizontal="true"
+        android:background="@android:drawable/ic_menu_camera" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_below="@+id/imageView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Result"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@android:color/background_dark"
+        android:background="@drawable/newline"
+        android:layout_margin="5dp"/>
+
+    <TextView
+        android:id="@+id/plantDetails"
+        android:layout_below="@id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Result will appear here..."
+        android:textColor="@android:color/black"
+        android:layout_margin="5dp"/>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_below="@+id/plantDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@android:color/background_dark"
+        android:text="Location"
+        android:background="@drawable/newline"
+        android:layout_margin="5dp"/>
+
+    <TextView
+        android:id="@+id/locationDetails"
+        android:layout_below="@id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Please take a photo to get the location..."
+        android:textColor="@android:color/black"
+        android:layout_margin="5dp"/>
+
+    <Button
+        android:id="@+id/export"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/locationDetails"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:padding="5dp"
+        android:text="EXPORT DATA"
+        android:background="#a75858"
+        />
+
+
+</RelativeLayout>
