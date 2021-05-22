@@ -4,11 +4,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -38,6 +42,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -101,6 +106,19 @@ public class MainActivity extends AppCompatActivity {
     int SELECT_FILE = 1;
    // ImageView imageView;
     Button select;
+    //rough work/////////////////////////////////////////////////////////////////////////////////////////
+//    private static ViewPager mPager;
+//    private static int currentPage = 0;
+//    private static int NUM_PAGES = 0;
+//    private ArrayList<ImageModel> imageModelArrayList;
+//    View retView;
+//
+//    private int[] myImageList = new int[]{R.drawable.iron, R.drawable.ironman,
+//            R.drawable.ironman2,R.drawable.prey
+//            ,R.drawable.tiger2,R.drawable.wall2};
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    Button dataCrop;
 
     public void getAddress(double lat, double lng) {
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
@@ -127,6 +145,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void replaceFragment(Fragment destFragment)
+    {
+        final int CONTENT_VIEW_ID = 10101010;
+        FrameLayout frame = new FrameLayout(this);
+        frame.setId(CONTENT_VIEW_ID);
+
+        // First get FragmentManager object.
+        FragmentManager fragmentManager = this.getFragmentManager();
+
+        // Begin Fragment transaction.
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        // Replace the layout holder with the required Fragment object.
+        fragmentTransaction.replace(R.id.dynamic_fragment_frame_layout, destFragment);
+
+        // Commit the Fragment replace action.
+        fragmentTransaction.commit();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -135,6 +172,15 @@ public class MainActivity extends AppCompatActivity {
         LocationDetails = (TextView) findViewById(R.id.locationDetails);
         plantDetails = (TextView) findViewById(R.id.plantDetails);
         this.imageView = (ImageView)this.findViewById(R.id.imageView);
+        dataCrop = (Button) findViewById(R.id.CropData);
+
+        dataCrop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment CropDataFragment = new cropDataFragment();
+                replaceFragment(CropDataFragment);
+            }
+        });
 
 
 //        FirebaseModelDownloadConditions.Builder conditionsBuilder =
