@@ -1,18 +1,23 @@
 package com.ggoogle.cropidentifier;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.location.LocationManager;
+import android.location.*;
+import android.location.LocationListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Looper;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.util.DebugUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +26,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import com.google.android.gms.location.*;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -32,6 +39,10 @@ import com.google.firebase.ml.custom.*;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Locale;
+
+import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -46,7 +57,13 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAKE_PHOTO_USING_CAMERA = "take photo using camera";
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 1;
     private static final int SELECT_FILE = 0;
+    private String district = "District Not Found";
 
+    //    private static Context mContext;
+//
+//    public static Context getContext() {
+//        return mContext;
+//    }
     LocationManager locationManager;
     TextView LocationDetails, plantDetails;
     String cropDetails;
@@ -55,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
     FirebaseCustomLocalModel localModel;
     FirebaseModelInterpreter interpreter;
     FirebaseModelInterpreterOptions options;
+    FusedLocationProviderClient locationClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +81,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         LocationDetails = (TextView) findViewById(R.id.locationDetails);
         plantDetails = (TextView) findViewById(R.id.plantDetails);
-        this.imageView = (ImageView)this.findViewById(R.id.imageView);
+        this.imageView = (ImageView) this.findViewById(R.id.imageView);
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        locationClient = getFusedLocationProviderClient(MainActivity.this);
+        locationUpdate();
 
         Button exportDataToFirebase = (Button) this.findViewById(R.id.export);
         exportDataToFirebase.setOnClickListener(new View.OnClickListener() {
@@ -79,10 +100,104 @@ public class MainActivity extends AppCompatActivity {
         pictureClickButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                 district = getLastLocation2();
+                Log.i(TAG, "onClick: district "+district);
+
                 String userAction = getUserActionForCamera();
-                Log.i("ONClickAction", "onClick: " + userAction);
+                Log.i("ONClickAction", "onClick: userAction" + userAction);
+//                getUserLocation();
+//                getLastLocation();
+
+
             }
         });
+    }
+
+    private String getLastLocation2() {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return null;
+        }
+        LocationServices.getFusedLocationProviderClient(MainActivity.this).getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                //TODO: UI updates.
+//                Toast.makeText(getApplicationContext(),"Hello Javatpoint"+location,Toast.LENGTH_SHORT).show();
+                double latitude = location.getLatitude();
+                double longitude = location.getLongitude();
+                Log.i(TAG, "onClickLocation: "+location+" "+latitude+" "+longitude);
+                district = getAddress(latitude, longitude);
+            }
+        });
+
+        Log.i(TAG, "getLastLocation2: "+district);
+        if(district == null) {
+            district = "address not found";
+        }
+        return district;
+    }
+
+    private String getAddress(double latitude, double longitude) {
+        Geocoder geocoder;
+        List<Address> addresses = null;
+        geocoder = new Geocoder(this, Locale.getDefault());
+
+        try {
+            addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+        } catch (IOException e) {
+            Log.e(TAG, "getAddress: "+e.getMessage());
+            return "address not found";
+        }
+
+        String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+        String city = addresses.get(0).getLocality();
+        String state = addresses.get(0).getAdminArea();
+        String country = addresses.get(0).getCountryName();
+        String postalCode = addresses.get(0).getPostalCode();
+        String district = addresses.get(0).getSubAdminArea();
+        String knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL
+        Log.i(TAG, "getAddress: "+address+" "+" ::"+city+" ::"+country+" ::"+postalCode+" ::"+knownName+" :: "+district);
+        return district;
+    }
+
+    private void locationUpdate() {
+        LocationRequest mLocationRequest = LocationRequest.create();
+        mLocationRequest.setInterval(60000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationCallback mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    if (location != null) {
+                        //TODO: UI updates.
+//                        Toast.makeText(getApplicationContext(),"LocationUpdate oncreate"+location,Toast.LENGTH_SHORT).show();
+                        Log.i(TAG, "onCreateLocation: "+location);
+                    }
+                }
+            }
+        };
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        LocationServices.getFusedLocationProviderClient(MainActivity.this).requestLocationUpdates(mLocationRequest, mLocationCallback, null);
     }
 
     private void performUserActionForCamera(String userAction) {
@@ -243,7 +358,7 @@ public class MainActivity extends AppCompatActivity {
 
                                                         String[] cropName = {"carrot", "coffee", "corn", "cotton", "mint", "rice", "sugarcane", "tobbaco", "tomato", "wheat"};
                                                         plantDetails.setText(cropName[max]+" with "+ (probabilities[max]*100)+ "% accuracy \n");
-                                                        LocationDetails.setText("loading...");
+                                                        LocationDetails.setText(district);
                                                         cropDetails = "\nCropName : "+ cropName[max];
                                                         //  Toast.makeText(getApplicationContext(), "success"+ output, Toast.LENGTH_LONG).show();
                                                     }
@@ -292,7 +407,6 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "getUserActionForCamera: "+response[0]);
         return response[0];
     }
-
 
     public void onCaptureImageResultFromGallery(Intent data) throws IOException {
 
