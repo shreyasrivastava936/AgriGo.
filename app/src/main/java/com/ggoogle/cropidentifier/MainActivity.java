@@ -1,6 +1,7 @@
 package com.ggoogle.cropidentifier;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -100,8 +101,9 @@ public class MainActivity extends AppCompatActivity {
         pictureClickButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 district = getLastLocation2();
-                Log.i(TAG, "onClick: district "+district);
+//                district = getLastLocation2();
+                 district = find_Location();
+                Log.i(TAG, "onClick: district " + district);
 
                 String userAction = getUserActionForCamera();
                 Log.i("ONClickAction", "onClick: userAction" + userAction);
@@ -111,6 +113,56 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public String find_Location() {
+        Log.d("Find Location", "in find_location");
+        String location_context = Context.LOCATION_SERVICE;
+        locationManager = (LocationManager) MainActivity.this.getSystemService(location_context);
+        List<String> providers = locationManager.getProviders(true);
+        for (String provider : providers) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                Log.i(TAG, "getLastLocation2: permission not granted");
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            }
+            locationManager.requestLocationUpdates(provider, 1000, 0,
+                    new LocationListener() {
+
+                        public void onLocationChanged(Location location) {
+                        }
+
+                        public void onProviderDisabled(String provider) {
+                        }
+
+                        public void onProviderEnabled(String provider) {
+                        }
+
+                        public void onStatusChanged(String provider, int status,
+                                                    Bundle extras) {
+                        }
+                    });
+            Location location = locationManager.getLastKnownLocation(provider);
+            if (location != null) {
+                double latitude = location.getLatitude();
+                double longitude = location.getLongitude();
+                Log.i(TAG, "onClickLocation: "+location+" "+latitude+" "+longitude);
+                district = getAddress(latitude, longitude);
+
+                Log.i(TAG, "getLastLocation2: "+district);
+                if(district == null) {
+                    district = "address not found";
+                }
+                return district;
+            }
+        }
+        return null;
     }
 
     private String getLastLocation2() {
@@ -123,11 +175,16 @@ public class MainActivity extends AppCompatActivity {
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-            return null;
+            Log.i(TAG, "getLastLocation2: permission not granted");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
         LocationServices.getFusedLocationProviderClient(MainActivity.this).getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
+                if(location == null) {
+                    Toast.makeText(MainActivity.this, "null location", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 //TODO: UI updates.
 //                Toast.makeText(getApplicationContext(),"Hello Javatpoint"+location,Toast.LENGTH_SHORT).show();
                 double latitude = location.getLatitude();

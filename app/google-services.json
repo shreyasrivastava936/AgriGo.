@@ -1,34 +1,33 @@
 {
   "project_info": {
-    "project_number": "413449401146",
-    "firebase_url": "https://cropidentifier.firebaseio.com",
-    "project_id": "cropidentifier",
-    "storage_bucket": "cropidentifier.appspot.com"
+    "project_number": "226659903759",
+    "project_id": "cropanalytics-6ccf3",
+    "storage_bucket": "cropanalytics-6ccf3.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:413449401146:android:a514a2e0dd9f2f43069603",
+        "mobilesdk_app_id": "1:226659903759:android:60e387ca43f4e81d5af67a",
         "android_client_info": {
           "package_name": "com.ggoogle.cropidentifier"
         }
       },
       "oauth_client": [
         {
-          "client_id": "413449401146-e7phvhd927nbfj76f5glhvji4mj9doh5.apps.googleusercontent.com",
+          "client_id": "226659903759-4jfpft9ccl5t0b0gkljvc6fos9bf70ne.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDJojRWuBpKQOzJqtax6eGweNmMfK0IPh8"
+          "current_key": "AIzaSyASK2ENKOj6LiVDcoy3gy69WCygkTVW978"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "413449401146-e7phvhd927nbfj76f5glhvji4mj9doh5.apps.googleusercontent.com",
+              "client_id": "226659903759-4jfpft9ccl5t0b0gkljvc6fos9bf70ne.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
