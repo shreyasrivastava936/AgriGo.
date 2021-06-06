@@ -39,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
     String TAG = "loginActivity";
     private void startMainActivity() {
         Intent myIntent = new Intent(LoginActivity.this, MainActivity.class);
+        myIntent.putExtra("id", mobile);
         LoginActivity.this.startActivity(myIntent);
     }
 
@@ -51,6 +52,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText editTextMobile;
 
+    private String mobile;
+
     //firebase auth object
     private FirebaseAuth mAuth;
 
@@ -62,25 +65,31 @@ public class LoginActivity extends AppCompatActivity {
 
         //initializing objects
         mAuth = FirebaseAuth.getInstance();
-//        editTextCode = findViewById(R.id.code);
-//        editTextMobile = findViewById(R.id.number);
-
-
-        //getting mobile number from the previous activity
-        //and sending the verification code to the number
-//        String mobile = getPhoneNumber();
-//        sendVerificationCode(mobile);
-
 
         //if the automatic sms detection did not work, user can also enter the code manually
         //so adding a click listener to the button
+        findViewById(R.id.getOTP).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mobile = getPhoneNumber();
+                sendVerificationCode(mobile);
+                Log.i(TAG, "onClick: getOTP verification code sent");
+                editTextMobile.setVisibility(View.INVISIBLE);
+                editTextCode = findViewById(R.id.code);
+                editTextCode.setVisibility(View.VISIBLE);
+                Button getOTP = findViewById(R.id.getOTP);
+                getOTP.setVisibility(View.INVISIBLE);
+                Button login = findViewById(R.id.login);
+                login.setVisibility(View.VISIBLE);
+            }
+        });
+        
         findViewById(R.id.login).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String mobile = getPhoneNumber();
-                sendVerificationCode(mobile);
                 editTextCode = findViewById(R.id.code); //TODO: set on click
                 String code = editTextCode.getText().toString().trim();
+                Log.i(TAG, "onClick: login code: "+code);
                 if (code.isEmpty() || code.length() < 6) {
                     editTextCode.setError("Enter valid code");
                     editTextCode.requestFocus();
@@ -170,6 +179,7 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             //verification successful we will start the profile activity
+                            Log.i(TAG, "onComplete: verification code verified");
                             startMainActivity();
 
                         } else {

@@ -7,7 +7,7 @@
                 android:background="@drawable/crop1"
                 android:paddingBottom = "5dp" tools:context = ".LoginActivity">
 
-    <TextView android:text = "Login" android:layout_width="wrap_content"
+    <TextView android:text = "Crop Analyser" android:layout_width="wrap_content"
               android:layout_height = "wrap_content"
               android:id = "@+id/textview"
               android:textSize = "35dp"
@@ -17,83 +17,97 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Crop Analyser"
+            android:text="Login"
             android:id="@+id/textView"
             android:layout_below="@+id/textview"
-            android:layout_centerHorizontal="true"
             android:textColor="#E91E63"
-            android:textSize="35dp"/>
-
+            android:textSize="35dp" android:layout_marginTop="56dp"
+            android:visibility="invisible"
+            android:layout_centerHorizontal="true"
+    />
     <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/number"
             android:hint="Enter Number"
             android:focusable="true"
             android:textColorHighlight="#ff7eff15"
             android:textColorHint="#ffff25e6"
-            android:layout_marginTop="46dp"
+            android:layout_marginBottom="75dp"
             android:layout_below="@+id/textView"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" android:inputType="phone"/>
+            android:layout_centerHorizontal="true"
+            android:paddingRight="15dp"
+            android:paddingLeft="15dp"
+            android:inputType="phone"
+            android:layout_above="@id/login"
+            android:layout_marginTop="61dp"
+            />
 
 
 
     <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:ems="10"
             android:id="@+id/code"
-            android:layout_below="@+id/number"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignRight="@+id/number"
-            android:layout_alignEnd="@+id/number"
+            android:layout_above="@id/getOTP"
             android:textColorHint="#ffff299f"
-            android:hint="Enter OTP" />
+            android:hint="Enter OTP"
+            android:paddingRight="15dp"
+            android:paddingLeft="15dp"
+            android:layout_marginTop="61dp"
+            android:layout_marginBottom="75dp"
+            android:layout_centerHorizontal="true"
+    android:visibility="invisible"/>
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Attempts Left:"
-            android:id="@+id/textView2"
-            android:layout_below="@+id/code"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:textSize="25dp" />
+<!--    <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Attempts Left:"-->
+<!--            android:id="@+id/textView2"-->
+<!--            android:layout_below="@+id/code"-->
+<!--            android:layout_alignParentLeft="true"-->
+<!--            android:layout_alignParentStart="true"-->
+<!--            android:textSize="25dp" />-->
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="New Text"
-            android:id="@+id/textView3"
-            android:layout_alignTop="@+id/textView2"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignBottom="@+id/textView2"
-            android:layout_toEndOf="@+id/textview"
-            android:textSize="25dp"
-            android:layout_toRightOf="@+id/textview" />
+<!--    <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="New Text"-->
+<!--            android:id="@+id/textView3"-->
+<!--            android:layout_alignTop="@+id/textView2"-->
+<!--            android:layout_alignParentRight="true"-->
+<!--            android:layout_alignParentEnd="true"-->
+<!--            android:layout_alignBottom="@+id/textView2"-->
+<!--            android:layout_toEndOf="@+id/textview"-->
+<!--            android:textSize="25dp"-->
+<!--            android:layout_toRightOf="@+id/textview" />-->
+
 
     <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="63dp"
             android:text="login"
             android:id="@+id/login"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="#AFD1B0"
             android:layout_centerInParent="true"
-            android:layout_toLeftOf="@+id/textview"
-            android:layout_toStartOf="@+id/textview" android:layout_centerHorizontal="true"
-            android:layout_marginRight="-91dp" android:layout_marginEnd="-91dp"/>
+            android:visibility="invisible"
+    />
     <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Cancel"
-            android:id="@+id/button2"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@+id/textview"
-            android:layout_toEndOf="@+id/textview" />
+            android:layout_width="match_parent"
+            android:layout_height="63dp"
+            android:text="Get OTP"
+            android:id="@+id/getOTP"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="#AFD1B0"
+            android:layout_centerInParent="true"/>
 
 </RelativeLayout>

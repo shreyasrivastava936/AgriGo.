@@ -33,6 +33,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.*;
 import com.google.firebase.ml.common.FirebaseMLException;
 import com.google.firebase.ml.common.modeldownload.FirebaseModelDownloadConditions;
 import com.google.firebase.ml.common.modeldownload.FirebaseModelManager;
@@ -40,6 +41,7 @@ import com.google.firebase.ml.custom.*;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 
@@ -74,12 +76,23 @@ public class MainActivity extends AppCompatActivity {
     FirebaseModelInterpreter interpreter;
     FirebaseModelInterpreterOptions options;
     FusedLocationProviderClient locationClient;
+    String userId;
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        firebaseDatabase = FirebaseDatabase.getInstance();
+
+
+        // below line is used to get reference for our database.
+//        databaseReference = firebaseDatabase.getReference("CropsInfo");
+
+
         LocationDetails = (TextView) findViewById(R.id.locationDetails);
         plantDetails = (TextView) findViewById(R.id.plantDetails);
         this.imageView = (ImageView) this.findViewById(R.id.imageView);
@@ -416,6 +429,7 @@ public class MainActivity extends AppCompatActivity {
                                                         String[] cropName = {"carrot", "coffee", "corn", "cotton", "mint", "rice", "sugarcane", "tobbaco", "tomato", "wheat"};
                                                         plantDetails.setText(cropName[max]+" with "+ (probabilities[max]*100)+ "% accuracy \n");
                                                         LocationDetails.setText(district);
+                                                        saveDataTofirebase(cropName[max], district);
                                                         cropDetails = "\nCropName : "+ cropName[max];
                                                         //  Toast.makeText(getApplicationContext(), "success"+ output, Toast.LENGTH_LONG).show();
                                                     }
@@ -436,6 +450,54 @@ public class MainActivity extends AppCompatActivity {
                 });
 
 
+    }
+
+    //sdk version >= 26
+    private void saveDataTofirebase(String cropName, String district) {
+        Log.i(TAG, "saveDataTofirebase: started "+cropName+" "+district);
+
+//        databaseReference = firebaseDatabase.getReference("CropsInfo/"+district);
+
+        String month = LocalDate.now().getMonth().toString();
+        Bundle extras= getIntent().getExtras();
+        if(extras == null)
+            return;
+        String userId = extras.getString("id", null);
+        if(userId == null)
+            return;
+
+//        CropDetails cropDetails = new CropDetails();
+//        MonthWiseDetails monthWiseDetails = new MonthWiseDetails();
+//        monthWiseDetails.setMonth(month);
+//        monthWiseDetails.setCropName(cropName);
+//        cropDetails.setDistrict(district);
+//        cropDetails.setUserId(userId);
+//        cropDetails.setMonthWiseDetails(monthWiseDetails);
+
+        databaseReference =
+//                firebaseDatabase.getReference("CropsInfo/"+district+"/"+userId+"/Month/"+month);
+                firebaseDatabase.getReference("CropsInfo/"+district+"/"+month+"/"+userId);
+
+        Log.i(TAG, "saveDataTofirebase2: ");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // inside the method of on Data change we are setting
+                // our object class to our database reference.
+                // data base reference will sends data to firebase.
+                databaseReference.setValue(cropName);
+
+                // after adding this data we are showing toast message.
+                Toast.makeText(MainActivity.this, "data added", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // if the data is not added or it is cancelled then
+                // we are displaying a failure toast message.
+                Toast.makeText(MainActivity.this, "Fail to add data " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private String getUserActionForCamera() {
