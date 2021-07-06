@@ -1,7 +1,9 @@
 package com.ggoogle.cropidentifier;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,7 +40,7 @@ public class GraphActivity extends AppCompatActivity {
         getDatabaseData();
 
         map.put("Carrot", 0);
-        map.put("Cofee", 1);
+        map.put("Coffee", 1);
         map.put("Corn", 2);
         map.put("Cotton", 3);
         map.put("Mint", 4);
@@ -47,8 +49,24 @@ public class GraphActivity extends AppCompatActivity {
         map.put("Tobbaco", 7);
         map.put("Tomato", 8);
         map.put("Wheat", 9);
-        
 
+        findViewById(R.id.switchScreen).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startMainActivity();
+            }
+        });
+
+    }
+
+    private void startMainActivity() {
+        Bundle extras= getIntent().getExtras();
+        if(extras == null)
+            return;
+        String userId = extras.getString("id", null);
+        Intent myIntent = new Intent(GraphActivity.this, MainActivity.class);
+        myIntent.putExtra("id", userId);
+        GraphActivity.this.startActivity(myIntent);
     }
 
     private void changeGraph(ArrayList<BarEntry> entries) {

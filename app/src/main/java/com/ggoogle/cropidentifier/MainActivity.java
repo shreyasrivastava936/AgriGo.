@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
         String location_context = Context.LOCATION_SERVICE;
         locationManager = (LocationManager) MainActivity.this.getSystemService(location_context);
         List<String> providers = locationManager.getProviders(true);
+        Log.i(TAG, "find_Location: "+providers);
         for (String provider : providers) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
@@ -149,16 +150,20 @@ public class MainActivity extends AppCompatActivity {
                     new LocationListener() {
 
                         public void onLocationChanged(Location location) {
+                            Log.i(TAG, "onLocationChanged: "+location);
                         }
 
                         public void onProviderDisabled(String provider) {
+                            Log.i(TAG, "onProviderDisabled: "+provider);
                         }
 
                         public void onProviderEnabled(String provider) {
+                            Log.i(TAG, "onProviderEnabled: "+provider);
                         }
 
                         public void onStatusChanged(String provider, int status,
                                                     Bundle extras) {
+                            Log.i(TAG, "onStatusChanged: "+provider);
                         }
                     });
             Location location = locationManager.getLastKnownLocation(provider);

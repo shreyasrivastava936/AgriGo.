@@ -13,5 +13,13 @@
             android:id="@+id/barchart"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+    <Button
+            android:id="@+id/switchScreen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Switch"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:background="@android:color/holo_blue_dark"/>
 
 </RelativeLayout>

@@ -7,12 +7,14 @@
                 android:background="@drawable/crop1"
                 android:paddingBottom = "5dp" tools:context = ".LoginActivity">
 
-    <TextView android:text = "Crop Analyser" android:layout_width="wrap_content"
-              android:layout_height = "wrap_content"
-              android:id = "@+id/textview"
-              android:textSize = "35dp"
-              android:layout_alignParentTop = "true"
-              android:layout_centerHorizontal = "true" />
+    <TextView android:text="Farmer Assistance System" android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:id="@+id/textview"
+              android:textSize="25dp"
+              android:layout_alignParentTop="true"
+              android:layout_centerHorizontal="true"
+              android:textAlignment="center"
+    />
 
     <TextView
             android:layout_width="wrap_content"
@@ -44,7 +46,6 @@
             />
 
 
-
     <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -52,14 +53,14 @@
             android:ems="10"
             android:id="@+id/code"
             android:layout_above="@id/getOTP"
-            android:textColorHint="#ffff299f"
+            android:textColorHint="#E84916"
             android:hint="Enter OTP"
             android:paddingRight="15dp"
             android:paddingLeft="15dp"
             android:layout_marginTop="61dp"
             android:layout_marginBottom="75dp"
             android:layout_centerHorizontal="true"
-    android:visibility="invisible"/>
+            android:visibility="invisible" android:textColorLink="#1E1E1E"/>
 
 <!--    <TextView-->
 <!--            android:layout_width="wrap_content"-->

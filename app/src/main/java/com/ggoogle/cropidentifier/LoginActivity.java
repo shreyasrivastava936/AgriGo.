@@ -38,7 +38,7 @@ public class LoginActivity extends AppCompatActivity {
 
     String TAG = "loginActivity";
     private void startMainActivity() {
-        Intent myIntent = new Intent(LoginActivity.this, MainActivity.class);
+        Intent myIntent = new Intent(LoginActivity.this, GraphActivity.class);
         myIntent.putExtra("id", mobile);
         LoginActivity.this.startActivity(myIntent);
     }
