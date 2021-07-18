@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
 //    public static Context getContext() {
 //        return mContext;
 //    }
-    LocationManager locationManager;
+//    LocationManager locationManager;
     TextView LocationDetails, plantDetails;
     String cropDetails;
     StringBuffer stringBuffer;
@@ -79,12 +79,17 @@ public class MainActivity extends AppCompatActivity {
     String userId;
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
+    Button exportData;
+
+    String cropNameFinal, locationFinal;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        exportData = findViewById(R.id.export);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
 
@@ -98,8 +103,8 @@ public class MainActivity extends AppCompatActivity {
         this.imageView = (ImageView) this.findViewById(R.id.imageView);
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        locationClient = getFusedLocationProviderClient(MainActivity.this);
+//        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+//        locationClient = getFusedLocationProviderClient(MainActivity.this);
         locationUpdate();
 
         Button exportDataToFirebase = (Button) this.findViewById(R.id.export);
@@ -126,97 +131,107 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        exportData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveDataTofirebase(cropNameFinal, locationFinal);
+            }
+        });
     }
 
     public String find_Location() {
-        Log.d("Find Location", "in find_location");
-        String location_context = Context.LOCATION_SERVICE;
-        locationManager = (LocationManager) MainActivity.this.getSystemService(location_context);
-        List<String> providers = locationManager.getProviders(true);
-        Log.i(TAG, "find_Location: "+providers);
-        for (String provider : providers) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                Log.i(TAG, "getLastLocation2: permission not granted");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            }
-            locationManager.requestLocationUpdates(provider, 1000, 0,
-                    new LocationListener() {
 
-                        public void onLocationChanged(Location location) {
-                            Log.i(TAG, "onLocationChanged: "+location);
-                        }
-
-                        public void onProviderDisabled(String provider) {
-                            Log.i(TAG, "onProviderDisabled: "+provider);
-                        }
-
-                        public void onProviderEnabled(String provider) {
-                            Log.i(TAG, "onProviderEnabled: "+provider);
-                        }
-
-                        public void onStatusChanged(String provider, int status,
-                                                    Bundle extras) {
-                            Log.i(TAG, "onStatusChanged: "+provider);
-                        }
-                    });
-            Location location = locationManager.getLastKnownLocation(provider);
-            if (location != null) {
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
-                Log.i(TAG, "onClickLocation: "+location+" "+latitude+" "+longitude);
-                district = getAddress(latitude, longitude);
-
-                Log.i(TAG, "getLastLocation2: "+district);
-                if(district == null) {
-                    district = "address not found";
-                }
-                return district;
-            }
-        }
-        return null;
-    }
-
-    private String getLastLocation2() {
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            Log.i(TAG, "getLastLocation2: permission not granted");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-        }
-        LocationServices.getFusedLocationProviderClient(MainActivity.this).getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if(location == null) {
-                    Toast.makeText(MainActivity.this, "null location", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                //TODO: UI updates.
-//                Toast.makeText(getApplicationContext(),"Hello Javatpoint"+location,Toast.LENGTH_SHORT).show();
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
-                Log.i(TAG, "onClickLocation: "+location+" "+latitude+" "+longitude);
-                district = getAddress(latitude, longitude);
-            }
-        });
-
-        Log.i(TAG, "getLastLocation2: "+district);
-        if(district == null) {
-            district = "address not found";
-        }
-        return district;
+        Bundle extras= getIntent().getExtras();
+        return extras.getString("location");
+//        Log.d("Find Location", "in find_location");
+//        String location_context = Context.LOCATION_SERVICE;
+//        locationManager = (LocationManager) MainActivity.this.getSystemService(location_context);
+//        List<String> providers = locationManager.getProviders(true);
+//        Log.i(TAG, "find_Location: "+providers);
+//        for (String provider : providers) {
+//            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                // TODO: Consider calling
+//                //    ActivityCompat#requestPermissions
+//                // here to request the missing permissions, and then overriding
+//                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                //                                          int[] grantResults)
+//                // to handle the case where the user grants the permission. See the documentation
+//                // for ActivityCompat#requestPermissions for more details.
+//                Log.i(TAG, "getLastLocation2: permission not granted");
+//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+//            }
+//            locationManager.requestLocationUpdates(provider, 1000, 0,
+//                    new LocationListener() {
+//
+//                        public void onLocationChanged(Location location) {
+//                            Log.i(TAG, "onLocationChanged: "+location);
+//                        }
+//
+//                        public void onProviderDisabled(String provider) {
+//                            Log.i(TAG, "onProviderDisabled: "+provider);
+//                        }
+//
+//                        public void onProviderEnabled(String provider) {
+//                            Log.i(TAG, "onProviderEnabled: "+provider);
+//                        }
+//
+//                        public void onStatusChanged(String provider, int status,
+//                                                    Bundle extras) {
+//                            Log.i(TAG, "onStatusChanged: "+provider);
+//                        }
+//                    });
+//            Location location = locationManager.getLastKnownLocation(provider);
+//            if (location != null) {
+//                double latitude = location.getLatitude();
+//                double longitude = location.getLongitude();
+//                Log.i(TAG, "onClickLocation: "+location+" "+latitude+" "+longitude);
+//                district = getAddress(latitude, longitude);
+//
+//                Log.i(TAG, "getLastLocation2: "+district);
+//                if(district == null) {
+//                    district = "address not found";
+//                }
+//                return district;
+//            }
+//        }
+//        return null;
+//    }
+//
+//    private String getLastLocation2() {
+//
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            // TODO: Consider calling
+//            //    ActivityCompat#requestPermissions
+//            // here to request the missing permissions, and then overriding
+//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//            //                                          int[] grantResults)
+//            // to handle the case where the user grants the permission. See the documentation
+//            // for ActivityCompat#requestPermissions for more details.
+//            Log.i(TAG, "getLastLocation2: permission not granted");
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+//        }
+//        LocationServices.getFusedLocationProviderClient(MainActivity.this).getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+//            @Override
+//            public void onSuccess(Location location) {
+//                if(location == null) {
+//                    Toast.makeText(MainActivity.this, "null location", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//                //TODO: UI updates.
+////                Toast.makeText(getApplicationContext(),"Hello Javatpoint"+location,Toast.LENGTH_SHORT).show();
+//                double latitude = location.getLatitude();
+//                double longitude = location.getLongitude();
+//                Log.i(TAG, "onClickLocation: "+location+" "+latitude+" "+longitude);
+//                district = getAddress(latitude, longitude);
+//            }
+//        });
+//
+//        Log.i(TAG, "getLastLocation2: "+district);
+//        if(district == null) {
+//            district = "address not found";
+//        }
+//        return district;
     }
 
     private String getAddress(double latitude, double longitude) {
@@ -434,7 +449,9 @@ public class MainActivity extends AppCompatActivity {
                                                         String[] cropName = {"carrot", "coffee", "corn", "cotton", "mint", "rice", "sugarcane", "tobbaco", "tomato", "wheat"};
                                                         plantDetails.setText(cropName[max]+" with "+ (probabilities[max]*100)+ "% accuracy \n");
                                                         LocationDetails.setText(district);
-                                                        saveDataTofirebase(cropName[max], district);
+                                                        cropNameFinal = cropName[max];
+                                                        locationFinal = district;
+//                                                        saveDataTofirebase(cropName[max], district);
                                                         cropDetails = "\nCropName : "+ cropName[max];
                                                         //  Toast.makeText(getApplicationContext(), "success"+ output, Toast.LENGTH_LONG).show();
                                                     }
@@ -479,9 +496,10 @@ public class MainActivity extends AppCompatActivity {
 //        cropDetails.setUserId(userId);
 //        cropDetails.setMonthWiseDetails(monthWiseDetails);
 
+        cropName = cropName.substring(0, 1).toUpperCase() + cropName.substring(1).toLowerCase();
         databaseReference =
 //                firebaseDatabase.getReference("CropsInfo/"+district+"/"+userId+"/Month/"+month);
-                firebaseDatabase.getReference("CropsInfo/"+district+"/"+month+"/"+userId);
+                firebaseDatabase.getReference("CropsInfo/"+district+"/"+month+"/"+cropName+"/"+userId);
 
         Log.i(TAG, "saveDataTofirebase2: ");
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -490,7 +508,7 @@ public class MainActivity extends AppCompatActivity {
                 // inside the method of on Data change we are setting
                 // our object class to our database reference.
                 // data base reference will sends data to firebase.
-                databaseReference.setValue(cropName);
+                databaseReference.setValue("value");
 
                 // after adding this data we are showing toast message.
                 Toast.makeText(MainActivity.this, "data added", Toast.LENGTH_SHORT).show();

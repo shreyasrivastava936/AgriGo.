@@ -17,9 +17,19 @@
             android:id="@+id/switchScreen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Switch"
+            android:text="Send Crop Details"
             android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
+            android:layout_alignParentRight="true"
+            android:background="@android:color/holo_blue_dark"/>
+
+    <Button
+            android:id="@+id/showAnalysis"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show Analysis"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="5dp"
             android:background="@android:color/holo_blue_dark"/>
 
 </RelativeLayout>

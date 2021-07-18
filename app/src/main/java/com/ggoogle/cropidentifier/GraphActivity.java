@@ -1,12 +1,18 @@
 package com.ggoogle.cropidentifier;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.*;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
@@ -14,21 +20,25 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.firebase.database.*;
 
+import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class GraphActivity extends AppCompatActivity {
 
     HashMap<String, Integer> map;
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
+    DatabaseReference databaseReferenceForAnalytics;
     DatabaseReference parentDatabaseReference;
+    DatabaseReference AnalysisDatabaseReference;
     BarDataSet bardataset;
     BarChart barChart;
     String TAG = "GraphActivity";
     Map<String, Long> cropVsUser;
+    LocationListener locationListener;
+    LocationManager locationManager;
+    private String location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +47,11 @@ public class GraphActivity extends AppCompatActivity {
         
         barChart = (BarChart) findViewById(R.id.barchart);
         map = new HashMap<>();
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         getDatabaseData();
 
         map.put("Carrot", 0);
-        map.put("Coffee", 1);
+        map.put("Cofee", 1);
         map.put("Corn", 2);
         map.put("Cotton", 3);
         map.put("Mint", 4);
@@ -57,6 +68,21 @@ public class GraphActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.showAnalysis).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "onClick: analysis button");
+                showAnalyticalData();
+            }
+        });
+
+    }
+
+    private void showAnalyticalData() {
+        //new page
+        //numbering by color & sort in descending order (top --> most demand)
+        //dialog box
+        startAnalyticsActivity();
     }
 
     private void startMainActivity() {
@@ -66,6 +92,18 @@ public class GraphActivity extends AppCompatActivity {
         String userId = extras.getString("id", null);
         Intent myIntent = new Intent(GraphActivity.this, MainActivity.class);
         myIntent.putExtra("id", userId);
+        myIntent.putExtra("location", location);
+        GraphActivity.this.startActivity(myIntent);
+    }
+
+    private void startAnalyticsActivity() {
+        Log.i(TAG, "startAnalyticsActivity: ");
+        Intent myIntent = new Intent(GraphActivity.this, AnalysticsActivity.class);
+        getLocation();
+        Log.i(TAG, "startAnalyticsActivity: location "+location);
+        myIntent.putExtra("location", location);
+        String month = LocalDate.now().getMonth().toString();
+        myIntent.putExtra("month", month);
         GraphActivity.this.startActivity(myIntent);
     }
 
@@ -99,11 +137,11 @@ public class GraphActivity extends AppCompatActivity {
 
         // below line is used to get
         // reference for our database.
-        String location = "Gautam Buddh Nagar";
+//        String location = "Gautam Buddh Nagar";
+        getLocation();
         String month = LocalDate.now().getMonth().toString();
 
-
-        checkForChangeinParentDatabase(firebaseDatabase, location);
+//        checkForChangeinParentDatabase(firebaseDatabase, location);
 
 
 
@@ -114,6 +152,7 @@ public class GraphActivity extends AppCompatActivity {
 
     private void checkForChangeinParentDatabase(FirebaseDatabase firebaseDatabase, String location) {
         Log.i(TAG, "checkForChangeinParentDatabase: started");
+        Log.i(TAG, "checkForChangeinParentDatabase: location "+location);
         String month = LocalDate.now().getMonth().toString();
 
         cropVsUser = new HashMap<>();
@@ -156,6 +195,7 @@ public class GraphActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
                 // calling on cancelled method when we receive
                 // any error or we are not able to get the data.
+                Log.e(TAG, "onCancelled: kk: "+ error);
                 Toast.makeText(GraphActivity.this, "Fail to get data.", Toast.LENGTH_SHORT).show();
             }
         });
@@ -192,5 +232,74 @@ public class GraphActivity extends AppCompatActivity {
             }
         });
         return count[0];
+    }
+
+    private void getLocation() {
+        locationListener = new LocationListener()
+        {
+
+            @Override
+            public void onLocationChanged(Location location2) {
+//                   Toast.makeText(getApplicationContext(),"Location: "+ location2.getLatitude() + "longitude:   "+ location2.getLongitude(),Toast.LENGTH_SHORT).show();
+                double lat = location2.getLatitude();
+                double lon = location2.getLongitude();
+                Log.i(TAG, "onLocationChanged: lat: "+lat);
+                getAddress(lat, lon);
+                locationManager.removeUpdates(locationListener);
+
+                checkForChangeinParentDatabase(firebaseDatabase, location);
+                //locationManager = null;
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                Log.i(TAG, "onStatusChanged: ");
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+                Log.i(TAG, "onProviderEnabled: ");
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+                Log.i(TAG, "onProviderDisabled: ");
+            }
+        };
+
+        if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(GraphActivity.this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
+        else {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+
+        }
+    }
+
+    public void getAddress(double lat, double lng) {
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+            Address obj = addresses.get(0);
+
+            if(obj != null) {
+                location = obj.getSubAdminArea();
+            }
+
+//            add = add + "\n" + obj.getCountryName();
+//            add = add + "\n" + obj.getCountryCode();
+//            add = add + "\n" + obj.getAdminArea();
+//            add = add + "\n" + obj.getPostalCode();
+//            add = add + "\n" + obj.getSubAdminArea();
+//            add = add + "\n" + obj.getLocality();
+//            add = add + "\n" + obj.getSubThoroughfare();
+
+            // Log.v("IGA", "Address" + add);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 }

@@ -139,7 +139,7 @@ public class LoginActivity extends AppCompatActivity {
             //in this case the code will be null
             //so user has to manually enter the code
             Log.i(TAG, "onVerificationCompleted: "+code);
-            Toast.makeText(LoginActivity.this, "code "+code, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(LoginActivity.this, "code "+code, Toast.LENGTH_SHORT).show();
             if (code != null) {
                 editTextCode.setText(code);
                 //verifying the code
